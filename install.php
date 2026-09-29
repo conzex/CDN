@@ -27,6 +27,11 @@ $requirements = [
         'passed' => extension_loaded('pdo'),
         'value' => extension_loaded('pdo') ? 'Enabled' : 'Disabled',
     ],
+    'pdo_mysql' => [
+        'name' => 'PDO MySQL Extension',
+        'passed' => extension_loaded('pdo_mysql'),
+        'value' => extension_loaded('pdo_mysql') ? 'Enabled' : 'Disabled',
+    ],
     'gd' => [
         'name' => 'GD Image Extension',
         'passed' => extension_loaded('gd') || extension_loaded('imagick'),
@@ -117,6 +122,7 @@ CACHE_STORE=database
 ENV;
 
             file_put_contents(__DIR__ . '/.env', $envContent);
+            @unlink(__DIR__ . '/bootstrap/cache/config.php');
 
             // Execute migrations and seed
             try {

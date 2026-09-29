@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mysql'),
+    'default' => (env('DB_CONNECTION') === 'sqlite' && !extension_loaded('pdo_sqlite')) ? 'mysql' : env('DB_CONNECTION', 'mysql'),
 
     /*
     |--------------------------------------------------------------------------
