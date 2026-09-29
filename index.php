@@ -4,6 +4,13 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
+// Polyfill mbstring functions if extension disabled on server
+if (!function_exists('mb_split')) {
+    function mb_split($pattern, $string, $limit = -1) {
+        return preg_split('/' . $pattern . '/u', $string, $limit);
+    }
+}
+
 // Redirect to installer if .env does not exist
 if (!file_exists(__DIR__.'/.env') && file_exists(__DIR__.'/install.php')) {
     header('Location: install.php');
