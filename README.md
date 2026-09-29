@@ -1,66 +1,110 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Production-Ready CDN File Manager (Laravel 11 + OneDrive UI)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A self-hosted CDN file manager built with **Laravel 11**, **Blade**, **Tailwind CSS (Dark Mode)**, and **Alpine.js**. Direct public asset access via simple URLs without authentication, paired with an admin panel inspired by Microsoft OneDrive.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- ⚡ **Direct Public Access**: Files stored directly inside `public/` are accessible via simple URLs (e.g., `https://cdn.conzex.com/bg/dc.jpg`).
+- 🎨 **OneDrive UI Shell**: Glassmorphism, light/dark mode persistence, clean breadcrumb navigation, search, and context menu.
+- 🛡️ **Security First**:
+  - Path traversal protection (`realpath` validation, null byte checks, `../` rejection).
+  - Dangerous extension blocking (`php`, `phar`, `phtml`, `exe`, `sh`, `bat`, `py`, `rb`, etc.).
+  - Dotfile hiding (`.env`, `.htaccess`, `.git`).
+  - Public HTTP access blocked for `.trash`.
+- 🖼️ **Thumbnail Generation**: Dynamic WebP thumbnails with cache header controls powered by `intervention/image:^3`.
+- 🗑️ **Recycle Bin**: Soft-deletion to `public/.trash/` with restore, purge, and empty bin capabilities.
+- 🔗 **Share Links**: Public share URLs with customizable expiration times (1h, 24h, 7d, 30d, never), optional password protection, and download limits.
+- 📦 **Zip Streaming**: Multi-file/folder download streaming via `maennchen/zipstream-php`.
+- 📜 **Activity Logger**: Automated activity logging for all operations (login, upload, rename, move, delete, share creation/download).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Admin Credentials
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **Username**: `admin`
+- **Password**: `Adm1n@123`
+- **Login URL**: `/login`
+- **Admin Dashboard**: `/admin`
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## cPanel & Shared Hosting Deployment Steps
 
-## Laravel Sponsors
+### 1. Upload Application Files
+1. Compress and upload all application files to your server directory (e.g., `/home/username/cdn-app`).
+2. Point your domain or subdomain (`cdn.conzex.com`) document root to `/home/username/cdn-app/public`.
+3. If document root cannot be modified on shared hosting, keep files in root and the included `.htaccess` file will automatically redirect traffic to `public/`.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 2. Set File Permissions
+Ensure the web server has write access to necessary directories:
+```bash
+chmod -R 755 storage bootstrap/cache public
+```
 
-### Premium Partners
+### 3. Environment & Database Configuration
+1. Copy `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+2. Update `.env` database parameters:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_DATABASE=your_cpanel_db
+   DB_USERNAME=your_cpanel_user
+   DB_PASSWORD=your_cpanel_password
+   ```
+3. Run migrations and seed the initial admin account:
+   ```bash
+   php artisan key:generate
+   php artisan migrate:fresh --seed
+   php artisan config:cache
+   php artisan route:cache
+   php artisan view:cache
+   ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+---
 
-## Contributing
+## Cron Schedule Configuration
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Add the standard Laravel scheduler entry to your cPanel Cron Jobs (running every minute):
+```cron
+* * * * * cd /home/username/cdn-app && php artisan schedule:run >> /dev/null 2>&1
+```
 
-## Code of Conduct
+The application schedules the following daily cleanup tasks:
+- `shares:prune` (Prunes expired/exhausted share links)
+- `activity:prune --days=90` (Prunes audit logs older than 90 days)
+- `recycle:purge --days=30` (Prunes trashed items older than 30 days)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Or manually add individual cron tasks:
+```cron
+0 0 * * * cd /home/username/cdn-app && php artisan shares:prune
+0 0 * * * cd /home/username/cdn-app && php artisan activity:prune --days=90
+0 0 * * * cd /home/username/cdn-app && php artisan recycle:purge --days=30
+```
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Backup Recipe
 
-## License
+### Database Backup
+```bash
+mysqldump -u cpanel_cdn_user -p cpanel_cdn_db > backup_cdn_db_$(date +%Y%m%d).sql
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### CDN Files Backup
+```bash
+tar -czf backup_public_files_$(date +%Y%m%d).tar.gz public/
+```
+
+---
+
+## Verification & Unit Testing
+
+Run the test suite:
+```bash
+php artisan test
+```
