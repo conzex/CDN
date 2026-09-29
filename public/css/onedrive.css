@@ -1,0 +1,26 @@
+/* OneDrive Color Tokens */
+:root {
+  --bg-app: #F3F2F1;
+  --bg-surface: #FFFFFF;
+  --bg-hover: #F3F2F1;
+  --border: #EDEBE9;
+  --text-primary: #323130;
+  --text-secondary: #605E5C;
+  --accent: #0078D4;
+  --accent-hover: #106EBE;
+}
+
+.dark {
+  --bg-app: #1B1A19;
+  --bg-surface: #252423;
+  --bg-hover: #323130;
+  --border: #3B3A39;
+  --text-primary: #F3F2F1;
+  --text-secondary: #C8C6C4;
+  --accent: #4CC2FF;
+  --accent-hover: #6FD0FF;
+}
+
+body {
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+}
