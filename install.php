@@ -1,7 +1,7 @@
 <?php
 
 /**
- * CDN Manager — WHMCS-Style Web Installer Wizard
+ * CDN Manager — Web Installer Wizard
  */
 
 session_start();
@@ -146,37 +146,38 @@ ENV;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CDN Manager — WHMCS Style Installer</title>
+    <title>CDN Manager — Web Installer Wizard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
+    <style>
+        body { font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col justify-between">
+<body class="bg-[#F3F2F1] text-[#323130] antialiased min-h-screen flex flex-col justify-between">
 
     <!-- Header -->
-    <header class="border-b border-slate-800 bg-slate-950 px-8 py-4 flex items-center justify-between">
+    <header class="border-b border-[#EDEBE9] bg-white px-8 py-4 flex items-center justify-between shadow-xs">
         <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-lg bg-sky-500 flex items-center justify-center font-bold text-white text-xl shadow-lg">
-                CDN
-            </div>
+            <img src="https://cdn.conzex.com/bg/dc.jpg" alt="CDN Logo" class="w-10 h-10 rounded-lg object-cover border border-[#EDEBE9]">
             <div>
-                <h1 class="text-lg font-bold tracking-tight text-white">CDN Manager Installer</h1>
-                <p class="text-xs text-slate-400">cPanel & Shared Hosting Automated Setup Wizard</p>
+                <h1 class="text-base font-bold tracking-tight text-[#323130]">CDN Manager Installer</h1>
+                <p class="text-xs text-[#605E5C]">cPanel & Shared Hosting Automated Setup Wizard</p>
             </div>
         </div>
-        <span class="text-xs font-semibold px-3 py-1 bg-sky-950 text-sky-400 rounded-full border border-sky-800">
+        <span class="text-xs font-semibold px-3 py-1 bg-[#EFF6FC] text-[#0078D4] rounded-full border border-[#0078D4]/20">
             Step <?php echo $step; ?> of 3
         </span>
     </header>
 
     <!-- Main Installer Wizard Container -->
     <main class="flex-1 flex items-center justify-center p-6">
-        <div class="w-full max-w-2xl bg-slate-950 border border-slate-800 rounded-xl shadow-2xl overflow-hidden">
+        <div class="w-full max-w-2xl bg-white border border-[#EDEBE9] rounded-xl shadow-lg overflow-hidden">
             
             <?php if (!empty($errors)): ?>
-                <div class="bg-rose-950 border-b border-rose-800 text-rose-200 p-4 text-xs space-y-1">
+                <div class="bg-rose-50 border-b border-rose-200 text-rose-800 p-4 text-xs space-y-1">
                     <?php foreach ($errors as $err): ?>
                         <div class="flex items-center space-x-2">
-                            <iconify-icon icon="solar:danger-triangle-bold" class="text-base text-rose-400 flex-shrink-0"></iconify-icon>
+                            <iconify-icon icon="solar:danger-triangle-bold" class="text-base text-rose-600 flex-shrink-0"></iconify-icon>
                             <span><?php echo htmlspecialchars($err); ?></span>
                         </div>
                     <?php endforeach; ?>
@@ -186,38 +187,41 @@ ENV;
             <?php if ($step == 1): ?>
                 <!-- STEP 1: Health & Requirements Check -->
                 <div class="p-8">
-                    <div class="mb-6">
-                        <h2 class="text-xl font-bold text-white mb-1">System Health Check</h2>
-                        <p class="text-xs text-slate-400">Checking server environment for WHMCS / cPanel compatibility.</p>
+                    <div class="flex items-center space-x-3 mb-6">
+                        <img src="https://cdn.conzex.com/bg/dc.jpg" alt="Logo" class="w-12 h-12 rounded-lg object-cover border border-[#EDEBE9]">
+                        <div>
+                            <h2 class="text-lg font-bold text-[#323130]">System Health Check</h2>
+                            <p class="text-xs text-[#605E5C]">Checking server environment for cPanel compatibility.</p>
+                        </div>
                     </div>
 
                     <div class="space-y-3 mb-8">
                         <?php foreach ($requirements as $req): ?>
-                            <div class="flex items-center justify-between p-3 rounded.lg bg-slate-900 border border-slate-800 text-xs">
-                                <span class="font-medium text-slate-200"><?php echo htmlspecialchars($req['name']); ?></span>
+                            <div class="flex items-center justify-between p-3 rounded-lg bg-[#F3F2F1] border border-[#EDEBE9] text-xs">
+                                <span class="font-medium text-[#323130]"><?php echo htmlspecialchars($req['name']); ?></span>
                                 <div class="flex items-center space-x-2">
-                                    <span class="text-slate-400"><?php echo htmlspecialchars($req['value']); ?></span>
+                                    <span class="text-[#605E5C]"><?php echo htmlspecialchars($req['value']); ?></span>
                                     <?php if ($req['passed']): ?>
-                                        <iconify-icon icon="solar:check-circle-bold" class="text-emerald-400 text-lg"></iconify-icon>
+                                        <iconify-icon icon="solar:check-circle-bold" class="text-emerald-600 text-lg"></iconify-icon>
                                     <?php else: ?>
-                                        <iconify-icon icon="solar:close-circle-bold" class="text-rose-500 text-lg"></iconify-icon>
+                                        <iconify-icon icon="solar:close-circle-bold" class="text-rose-600 text-lg"></iconify-icon>
                                     <?php endif; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
 
-                    <div class="flex justify-between items-center pt-4 border-t border-slate-800">
-                        <span class="text-xs text-slate-500">
+                    <div class="flex justify-between items-center pt-4 border-t border-[#EDEBE9]">
+                        <span class="text-xs text-[#605E5C]">
                             <?php echo $allRequirementsPassed ? 'All checks passed cleanly!' : 'Please resolve failed checks on server.'; ?>
                         </span>
                         <?php if ($allRequirementsPassed): ?>
-                            <a href="install.php?step=2" class="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-lg transition-colors flex items-center space-x-2">
+                            <a href="install.php?step=2" class="px-6 py-2.5 bg-[#0078D4] hover:bg-[#106EBE] text-white text-xs font-bold rounded-lg transition-colors flex items-center space-x-2 shadow">
                                 <span>Continue Configuration</span>
                                 <iconify-icon icon="solar:alt-arrow-right-bold" class="text-sm"></iconify-icon>
                             </a>
                         <?php else: ?>
-                            <button disabled class="px-6 py-2.5 bg-slate-800 text-slate-500 text-xs font-bold rounded-lg cursor-not-allowed">
+                            <button disabled class="px-6 py-2.5 bg-slate-200 text-slate-500 text-xs font-bold rounded-lg cursor-not-allowed">
                                 Fix Requirements To Continue
                             </button>
                         <?php endif; ?>
@@ -229,65 +233,68 @@ ENV;
                 <form method="POST" action="install.php" class="p-8">
                     <input type="hidden" name="action" value="install">
                     
-                    <div class="mb-6">
-                        <h2 class="text-xl font-bold text-white mb-1">Database & App Setup</h2>
-                        <p class="text-xs text-slate-400">Enter your cPanel MySQL database details and site configuration.</p>
+                    <div class="flex items-center space-x-3 mb-6">
+                        <img src="https://cdn.conzex.com/bg/dc.jpg" alt="Logo" class="w-12 h-12 rounded-lg object-cover border border-[#EDEBE9]">
+                        <div>
+                            <h2 class="text-lg font-bold text-[#323130]">Database & App Setup</h2>
+                            <p class="text-xs text-[#605E5C]">Enter your cPanel MySQL database details and site configuration.</p>
+                        </div>
                     </div>
 
                     <div class="space-y-4 mb-8">
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Application URL</label>
-                            <input type="url" name="app_url" required value="<?php echo 'http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'); ?>" class="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-800 text-white rounded-lg focus:outline-none focus:border-sky-500">
+                            <label class="block text-xs font-medium text-[#605E5C] mb-1">Application URL</label>
+                            <input type="url" name="app_url" required value="<?php echo 'https://' . ($_SERVER['HTTP_HOST'] ?? 'cdn.conzex.com'); ?>" class="w-full px-3 py-2 text-xs bg-[#F3F2F1] border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-medium text-slate-300 mb-1">Database Driver</label>
-                                <select name="db_connection" class="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-800 text-white rounded-lg focus:outline-none">
+                                <label class="block text-xs font-medium text-[#605E5C] mb-1">Database Driver</label>
+                                <select name="db_connection" class="w-full px-3 py-2 text-xs bg-[#F3F2F1] border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                                     <option value="mysql">MySQL (cPanel standard)</option>
                                     <option value="sqlite">SQLite (Standalone / Zero config)</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-300 mb-1">Database Host</label>
-                                <input type="text" name="db_host" value="127.0.0.1" class="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-800 text-white rounded-lg focus:outline-none">
+                                <label class="block text-xs font-medium text-[#605E5C] mb-1">Database Host</label>
+                                <input type="text" name="db_host" value="127.0.0.1" class="w-full px-3 py-2 text-xs bg-[#F3F2F1] border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-medium text-slate-300 mb-1">Database Name</label>
-                                <input type="text" name="db_database" placeholder="cpanel_cdn_db" class="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-800 text-white rounded-lg focus:outline-none">
+                                <label class="block text-xs font-medium text-[#605E5C] mb-1">Database Name</label>
+                                <input type="text" name="db_database" placeholder="cpanel_cdn_db" class="w-full px-3 py-2 text-xs bg-[#F3F2F1] border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-300 mb-1">Database Username</label>
-                                <input type="text" name="db_username" placeholder="cpanel_cdn_user" class="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-800 text-white rounded-lg focus:outline-none">
+                                <label class="block text-xs font-medium text-[#605E5C] mb-1">Database Username</label>
+                                <input type="text" name="db_username" placeholder="cpanel_cdn_user" class="w-full px-3 py-2 text-xs bg-[#F3F2F1] border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Database Password</label>
-                            <input type="password" name="db_password" placeholder="Database User Password" class="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-800 text-white rounded-lg focus:outline-none">
+                            <label class="block text-xs font-medium text-[#605E5C] mb-1">Database Password</label>
+                            <input type="password" name="db_password" placeholder="Database User Password" class="w-full px-3 py-2 text-xs bg-[#F3F2F1] border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                         </div>
 
-                        <div class="border-t border-slate-800 pt-4">
-                            <h3 class="text-xs font-bold text-sky-400 mb-3 uppercase tracking-wider">Admin Login Credentials</h3>
+                        <div class="border-t border-[#EDEBE9] pt-4">
+                            <h3 class="text-xs font-bold text-[#0078D4] mb-3 uppercase tracking-wider">Admin Login Credentials</h3>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-medium text-slate-300 mb-1">Admin Username</label>
-                                    <input type="text" name="admin_user" value="admin" required class="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-800 text-white rounded-lg focus:outline-none">
+                                    <label class="block text-xs font-medium text-[#605E5C] mb-1">Admin Username</label>
+                                    <input type="text" name="admin_user" value="admin" required class="w-full px-3 py-2 text-xs bg-[#F3F2F1] border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-slate-300 mb-1">Admin Password</label>
-                                    <input type="text" name="admin_pass" value="Adm1n@123" required class="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-800 text-white rounded-lg focus:outline-none">
+                                    <label class="block text-xs font-medium text-[#605E5C] mb-1">Admin Password</label>
+                                    <input type="text" name="admin_pass" value="Adm1n@123" required class="w-full px-3 py-2 text-xs bg-[#F3F2F1] border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex justify-between items-center pt-4 border-t border-slate-800">
-                        <a href="install.php?step=1" class="text-xs text-slate-400 hover:text-white">← Back</a>
-                        <button type="submit" class="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-lg transition-colors flex items-center space-x-2">
+                    <div class="flex justify-between items-center pt-4 border-t border-[#EDEBE9]">
+                        <a href="install.php?step=1" class="text-xs text-[#605E5C] hover:text-[#323130]">← Back</a>
+                        <button type="submit" class="px-6 py-2.5 bg-[#0078D4] hover:bg-[#106EBE] text-white text-xs font-bold rounded-lg transition-colors flex items-center space-x-2 shadow">
                             <span>Install & Seed Database</span>
                             <iconify-icon icon="solar:check-circle-bold" class="text-base"></iconify-icon>
                         </button>
@@ -297,28 +304,28 @@ ENV;
             <?php elseif ($step == 3): ?>
                 <!-- STEP 3: Success Completion -->
                 <div class="p-8 text-center">
-                    <iconify-icon icon="solar:check-circle-bold" class="text-6xl text-emerald-400 mb-4"></iconify-icon>
-                    <h2 class="text-2xl font-bold text-white mb-2">Installation Complete!</h2>
-                    <p class="text-xs text-slate-400 max-w-md mx-auto mb-6">
+                    <img src="https://cdn.conzex.com/bg/dc.jpg" alt="Logo" class="w-16 h-16 rounded-full mx-auto mb-4 object-cover border border-[#EDEBE9] shadow">
+                    <h2 class="text-xl font-bold text-[#323130] mb-2">Installation Complete!</h2>
+                    <p class="text-xs text-[#605E5C] max-w-md mx-auto mb-6">
                         CDN Manager has been successfully installed and seeded on your server.
                     </p>
 
-                    <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 max-w-md mx-auto mb-8 text-left text-xs space-y-2">
-                        <div class="flex justify-between border-b border-slate-800 pb-2">
-                            <span class="text-slate-400">Admin Username:</span>
-                            <span class="font-bold text-white">admin</span>
+                    <div class="bg-[#F3F2F1] border border-[#EDEBE9] rounded-lg p-4 max-w-md mx-auto mb-8 text-left text-xs space-y-2">
+                        <div class="flex justify-between border-b border-[#EDEBE9] pb-2">
+                            <span class="text-[#605E5C]">Admin Username:</span>
+                            <span class="font-bold text-[#323130]">admin</span>
                         </div>
-                        <div class="flex justify-between border-b border-slate-800 pb-2">
-                            <span class="text-slate-400">Admin Password:</span>
-                            <span class="font-bold text-white">Adm1n@123</span>
+                        <div class="flex justify-between border-b border-[#EDEBE9] pb-2">
+                            <span class="text-[#605E5C]">Admin Password:</span>
+                            <span class="font-bold text-[#323130]">Adm1n@123</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-slate-400">Login URL:</span>
-                            <a href="login" class="text-sky-400 underline font-mono">/login</a>
+                            <span class="text-[#605E5C]">Login URL:</span>
+                            <a href="login" class="text-[#0078D4] underline font-mono">/login</a>
                         </div>
                     </div>
 
-                    <a href="login" class="inline-flex items-center space-x-2 px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg transition-colors shadow-lg">
+                    <a href="login" class="inline-flex items-center space-x-2 px-8 py-3 bg-[#0078D4] hover:bg-[#106EBE] text-white text-xs font-bold rounded-lg transition-colors shadow">
                         <span>Go to Admin Dashboard</span>
                         <iconify-icon icon="solar:alt-arrow-right-bold" class="text-base"></iconify-icon>
                     </a>
@@ -329,8 +336,8 @@ ENV;
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-slate-800 bg-slate-950 px-8 py-3 text-center text-xs text-slate-500">
-        CDN File Manager • Production-Ready WHMCS Style Package
+    <footer class="border-t border-[#EDEBE9] bg-white px-8 py-3 text-center text-xs text-[#605E5C]">
+        CDN File Manager • Production-Ready cPanel Package
     </footer>
 
 </body>

@@ -60,7 +60,7 @@
             </a>
             <span class="text-[var(--border)]">|</span>
             <div class="flex items-center space-x-2">
-                <iconify-icon icon="solar:trash-bin-trash-bold" class="text-xl text-rose-500"></iconify-icon>
+                <img src="https://cdn.conzex.com/bg/dc.jpg" alt="Logo" class="w-8 h-8 rounded object-cover border border-[var(--border)]">
                 <h1 class="text-lg font-semibold text-[var(--text-primary)]">Recycle Bin</h1>
             </div>
         </div>

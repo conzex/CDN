@@ -25,7 +25,7 @@ if (file_exists(__DIR__.'/vendor/autoload.php')) {
 // Bootstrap Laravel
 $app = require_once __DIR__.'/bootstrap/app.php';
 
-// Set public path to current directory for WHMCS-style cPanel root deployment
+// Set public path to current directory for cPanel root deployment
 $app->usePublicPath(__DIR__);
 
 // Handle request

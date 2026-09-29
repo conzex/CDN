@@ -17,7 +17,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         //
     })->create();
 
-// Support WHMCS-style root deployment where index.php is in base path
+// Support standalone root deployment where index.php is in base path
 if (file_exists(dirname(__DIR__).'/index.php') && !is_dir(dirname(__DIR__).'/public/index.php')) {
     $app->usePublicPath(dirname(__DIR__));
 }

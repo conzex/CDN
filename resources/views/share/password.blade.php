@@ -4,7 +4,7 @@
 <div class="min-h-screen bg-[var(--bg-app)] flex flex-col items-center justify-center p-4">
     <div class="w-full max-w-md bg-[var(--bg-surface)] border border-[var(--border)] rounded-lg shadow-xl p-8">
         <div class="text-center mb-6">
-            <iconify-icon icon="solar:lock-password-bold" class="text-5xl text-[var(--accent)] mb-3"></iconify-icon>
+            <img src="https://cdn.conzex.com/bg/dc.jpg" alt="Logo" class="w-16 h-16 rounded-full mx-auto mb-3 object-cover border border-[var(--border)] shadow">
             <h2 class="text-xl font-bold text-[var(--text-primary)]">Protected Share Link</h2>
             <p class="text-xs text-[var(--text-secondary)] mt-1">Please enter the password to access this shared file.</p>
         </div>

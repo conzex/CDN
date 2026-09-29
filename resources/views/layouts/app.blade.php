@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'CDN Manager') }}</title>
+    <link rel="icon" href="https://cdn.conzex.com/bg/dc.jpg" type="image/jpeg">
     <!-- Inline script to prevent FOWT (Flash of Wrong Theme) -->
     <script>(function(){var t=localStorage.getItem('cdn-theme')||'{{ auth()->check() ? auth()->user()->theme : "light" }}';if(t==='dark')document.documentElement.classList.add('dark');})();</script>
     <script src="https://cdn.tailwindcss.com"></script>
