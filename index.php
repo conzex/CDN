@@ -11,8 +11,8 @@ if (!function_exists('mb_split')) {
     }
 }
 
-// Redirect to installer if .env does not exist
-if (!file_exists(__DIR__.'/.env') && file_exists(__DIR__.'/install.php')) {
+// Redirect to installer if .env or installed.lock does not exist
+if ((!file_exists(__DIR__.'/.env') || !file_exists(__DIR__.'/installed.lock')) && file_exists(__DIR__.'/install.php')) {
     header('Location: install.php');
     exit;
 }
