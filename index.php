@@ -35,12 +35,12 @@ $app = require_once __DIR__.'/bootstrap/app.php';
 // Set public path to current directory for cPanel root deployment
 $app->usePublicPath(__DIR__);
 
-// Handle request with graceful fallback to installer before installation
+// Handle request with graceful fallback to installer on database failure
 try {
     $app->handleRequest(Request::capture());
 } catch (\Throwable $e) {
-    if (!file_exists(__DIR__.'/installed.lock') && file_exists(__DIR__.'/install.php')) {
-        header('Location: install.php');
+    if (file_exists(__DIR__.'/install.php')) {
+        header('Location: install.php?error=db');
         exit;
     }
     throw $e;
