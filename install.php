@@ -1,7 +1,7 @@
 <?php
 
 /**
- * CDN Manager — 1st Time Web Installer & Reconfiguration Wizard
+ * Open File Share — Installation & Setup Wizard
  */
 
 session_start();
@@ -50,7 +50,7 @@ if (file_exists($lockFile) && $dbWorking && !$reinstall && !$hasDbError) {
 $errors = [];
 if (!$dbWorking || $hasDbError) {
     $step = $_GET['step'] ?? 2;
-    $errors[] = 'Database connection error detected. Please verify your cPanel MySQL host, database name, username, and password below.';
+    $errors[] = 'Database connection error detected. Please verify your database host, database name, username, and password below.';
 } else {
     $step = $_GET['step'] ?? 1;
 }
@@ -117,24 +117,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     if ($action === 'install') {
-        $appUrl = rtrim(trim($_POST['app_url'] ?? ''), '/');
+        $defaultUrl = 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
+        $appUrl = rtrim(trim($_POST['app_url'] ?? $defaultUrl), '/');
+        if (empty($appUrl)) {
+            $appUrl = $defaultUrl;
+        }
+
         $dbConn = $_POST['db_connection'] ?? 'mysql';
-        $dbHost = trim($_POST['db_host'] ?? '127.0.0.1');
-        $dbPort = trim($_POST['db_port'] ?? '3306');
+        $dbHost = trim($_POST['db_host'] ?? '') ?: '127.0.0.1';
+        $dbPort = trim($_POST['db_port'] ?? '') ?: '3306';
         $dbName = trim($_POST['db_database'] ?? '');
         $dbUser = trim($_POST['db_username'] ?? '');
         $dbPass = $_POST['db_password'] ?? '';
         
-        $adminUser = trim($_POST['admin_user'] ?? 'admin');
-        $adminEmail = trim($_POST['admin_email'] ?? 'admin@cdn.conzex.com');
+        $adminUser = trim($_POST['admin_user'] ?? '') ?: 'admin';
+        $adminEmail = trim($_POST['admin_email'] ?? '') ?: 'admin@example.com';
         $adminPass = $_POST['admin_pass'] ?? '';
         $adminPassConfirm = $_POST['admin_pass_confirm'] ?? '';
 
         // Field Validations
-        if (empty($appUrl)) {
-            $errors[] = 'Application URL is required.';
-        }
-
         if (empty($adminUser)) {
             $errors[] = 'Super Admin Username is required.';
         } elseif (strlen($adminUser) < 3) {
@@ -182,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             PDO::ATTR_TIMEOUT => 5,
                         ]);
                     } catch (\Throwable $createEx) {
-                        $errors[] = 'MySQL Database Connection Failed: ' . $e->getMessage() . '. Please verify your database host, database name, username, and password.';
+                        $errors[] = 'MySQL Database Connection Failed: ' . $e->getMessage() . '. Please verify your host, database name, username, and password.';
                     }
                 }
             }
@@ -314,7 +315,7 @@ ENV;
                             ]);
                         }
                     } catch (\Throwable $pdoUserEx) {
-                        // Seeder already handled user creation
+                        // Seeder handled user creation
                     }
                 }
 
@@ -337,7 +338,7 @@ ENV;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CDN Manager — 1st Time Wizard Setup</title>
+    <title>Setup Wizard — Open File Share</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
     <style>
@@ -349,10 +350,12 @@ ENV;
     <!-- Header -->
     <header class="border-b border-[#EDEBE9] bg-white px-8 py-4 flex items-center justify-between shadow-xs">
         <div class="flex items-center space-x-3">
-            <img src="https://cdn.conzex.com/bg/dc.jpg" alt="CDN Logo" class="w-10 h-10 rounded-lg object-cover border border-[#EDEBE9]">
+            <div class="w-10 h-10 rounded-lg bg-[#0078D4] text-white flex items-center justify-center font-bold text-lg shadow">
+                <iconify-icon icon="solar:folder-with-files-bold" class="text-xl"></iconify-icon>
+            </div>
             <div>
-                <h1 class="text-base font-bold tracking-tight text-[#323130]">CDN Manager Installer</h1>
-                <p class="text-xs text-[#605E5C]">cPanel & Shared Hosting Automated Setup Wizard</p>
+                <h1 class="text-base font-bold tracking-tight text-[#323130]">Open File Share Installer</h1>
+                <p class="text-xs text-[#605E5C]">Automated Installation & Setup Wizard</p>
             </div>
         </div>
         <span class="text-xs font-semibold px-3 py-1 bg-[#EFF6FC] text-[#0078D4] rounded-full border border-[#0078D4]/20">
@@ -379,10 +382,12 @@ ENV;
                 <!-- STEP 1: Health & Requirements Check -->
                 <div class="p-8">
                     <div class="flex items-center space-x-3 mb-6">
-                        <img src="https://cdn.conzex.com/bg/dc.jpg" alt="Logo" class="w-12 h-12 rounded-lg object-cover border border-[#EDEBE9]">
+                        <div class="w-12 h-12 rounded-lg bg-[#0078D4]/10 text-[#0078D4] flex items-center justify-center">
+                            <iconify-icon icon="solar:shield-check-bold" class="text-2xl"></iconify-icon>
+                        </div>
                         <div>
                             <h2 class="text-lg font-bold text-[#323130]">System Health Check</h2>
-                            <p class="text-xs text-[#605E5C]">Checking server environment for cPanel compatibility.</p>
+                            <p class="text-xs text-[#605E5C]">Verifying server PHP extensions and write permissions.</p>
                         </div>
                     </div>
 
@@ -404,7 +409,7 @@ ENV;
 
                     <div class="flex justify-between items-center pt-4 border-t border-[#EDEBE9]">
                         <span class="text-xs text-[#605E5C]">
-                            <?php echo $allRequirementsPassed ? 'All checks passed cleanly!' : 'Please resolve failed checks on server.'; ?>
+                            <?php echo $allRequirementsPassed ? 'All system checks passed cleanly!' : 'Please resolve failed checks on server.'; ?>
                         </span>
                         <?php if ($allRequirementsPassed): ?>
                             <a href="install.php?step=2<?php echo $reinstall ? '&reinstall=1' : ''; ?>" class="px-6 py-2.5 bg-[#0078D4] hover:bg-[#106EBE] text-white text-xs font-bold rounded-lg transition-colors flex items-center space-x-2 shadow">
@@ -425,17 +430,19 @@ ENV;
                     <input type="hidden" name="action" value="install">
                     
                     <div class="flex items-center space-x-3 mb-6">
-                        <img src="https://cdn.conzex.com/bg/dc.jpg" alt="Logo" class="w-12 h-12 rounded-lg object-cover border border-[#EDEBE9]">
+                        <div class="w-12 h-12 rounded-lg bg-[#0078D4]/10 text-[#0078D4] flex items-center justify-center">
+                            <iconify-icon icon="solar:settings-bold" class="text-2xl"></iconify-icon>
+                        </div>
                         <div>
                             <h2 class="text-lg font-bold text-[#323130]">Database & Super User Configuration</h2>
-                            <p class="text-xs text-[#605E5C]">Specify your database credentials and initial super admin login details.</p>
+                            <p class="text-xs text-[#605E5C]">Enter your database settings and create your super admin account.</p>
                         </div>
                     </div>
 
                     <div class="space-y-5 mb-8">
                         <div>
                             <label class="block text-xs font-semibold text-[#323130] mb-1">Application URL</label>
-                            <input type="url" name="app_url" required value="<?php echo htmlspecialchars($_POST['app_url'] ?? ('https://' . ($_SERVER['HTTP_HOST'] ?? 'cdn.conzex.com'))); ?>" class="w-full px-3 py-2 text-xs bg-[#F3F2F1] border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
+                            <input type="url" name="app_url" required value="<?php echo htmlspecialchars($_POST['app_url'] ?? ''); ?>" placeholder="<?php echo 'https://' . ($_SERVER['HTTP_HOST'] ?? 'example.com'); ?>" class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                         </div>
 
                         <!-- Database Details Card -->
@@ -449,34 +456,34 @@ ENV;
                                 <div>
                                     <label class="block text-xs font-medium text-[#605E5C] mb-1">Database Driver</label>
                                     <select name="db_connection" class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
-                                        <option value="mysql" <?php echo ($_POST['db_connection'] ?? 'mysql') === 'mysql' ? 'selected' : ''; ?>>MySQL / MariaDB (cPanel)</option>
+                                        <option value="mysql" <?php echo ($_POST['db_connection'] ?? 'mysql') === 'mysql' ? 'selected' : ''; ?>>MySQL / MariaDB</option>
                                         <option value="sqlite" <?php echo ($_POST['db_connection'] ?? '') === 'sqlite' ? 'selected' : ''; ?>>SQLite (Standalone)</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-[#605E5C] mb-1">Database Host</label>
-                                    <input type="text" name="db_host" value="<?php echo htmlspecialchars($_POST['db_host'] ?? '127.0.0.1'); ?>" required class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
+                                    <input type="text" name="db_host" value="<?php echo htmlspecialchars($_POST['db_host'] ?? ''); ?>" placeholder="127.0.0.1" class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-[#605E5C] mb-1">Database Port</label>
-                                    <input type="text" name="db_port" value="<?php echo htmlspecialchars($_POST['db_port'] ?? '3306'); ?>" required class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
+                                    <input type="text" name="db_port" value="<?php echo htmlspecialchars($_POST['db_port'] ?? ''); ?>" placeholder="3306" class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-medium text-[#605E5C] mb-1">Database Name</label>
-                                    <input type="text" name="db_database" placeholder="e.g. cpanel_cdn_db" value="<?php echo htmlspecialchars($_POST['db_database'] ?? ''); ?>" class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
+                                    <input type="text" name="db_database" placeholder="e.g. cdn_database" value="<?php echo htmlspecialchars($_POST['db_database'] ?? ''); ?>" class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-[#605E5C] mb-1">Database Username</label>
-                                    <input type="text" name="db_username" placeholder="e.g. cpanel_cdn_user" value="<?php echo htmlspecialchars($_POST['db_username'] ?? ''); ?>" class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
+                                    <input type="text" name="db_username" placeholder="e.g. cdn_user" value="<?php echo htmlspecialchars($_POST['db_username'] ?? ''); ?>" class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block text-xs font-medium text-[#605E5C] mb-1">Database Password</label>
-                                <input type="password" name="db_password" placeholder="MySQL User Password" value="<?php echo htmlspecialchars($_POST['db_password'] ?? ''); ?>" class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
+                                <input type="password" name="db_password" placeholder="Database User Password" value="" class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                             </div>
                         </div>
 
@@ -490,22 +497,22 @@ ENV;
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-medium text-[#605E5C] mb-1">Super Username</label>
-                                    <input type="text" name="admin_user" value="<?php echo htmlspecialchars($_POST['admin_user'] ?? 'admin'); ?>" required class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
+                                    <input type="text" name="admin_user" value="<?php echo htmlspecialchars($_POST['admin_user'] ?? ''); ?>" placeholder="e.g. admin" required class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-[#605E5C] mb-1">Super Admin Email</label>
-                                    <input type="email" name="admin_email" value="<?php echo htmlspecialchars($_POST['admin_email'] ?? 'admin@cdn.conzex.com'); ?>" required class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
+                                    <input type="email" name="admin_email" value="<?php echo htmlspecialchars($_POST['admin_email'] ?? ''); ?>" placeholder="e.g. admin@example.com" required class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-medium text-[#605E5C] mb-1">Super Admin Password</label>
-                                    <input type="password" name="admin_pass" value="<?php echo htmlspecialchars($_POST['admin_pass'] ?? 'Adm1n@123'); ?>" required class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
+                                    <input type="password" name="admin_pass" value="" placeholder="Enter Super Admin Password" required class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-[#605E5C] mb-1">Confirm Super Admin Password</label>
-                                    <input type="password" name="admin_pass_confirm" value="<?php echo htmlspecialchars($_POST['admin_pass_confirm'] ?? 'Adm1n@123'); ?>" required class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
+                                    <input type="password" name="admin_pass_confirm" value="" placeholder="Confirm Super Admin Password" required class="w-full px-3 py-2 text-xs bg-white border border-[#EDEBE9] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4]">
                                 </div>
                             </div>
                         </div>
@@ -526,11 +533,13 @@ ENV;
             <?php elseif ($step == 3): ?>
                 <!-- STEP 3: Success Completion -->
                 <div class="p-8 text-center space-y-6">
-                    <img src="https://cdn.conzex.com/bg/dc.jpg" alt="Logo" class="w-16 h-16 rounded-full mx-auto object-cover border border-[#EDEBE9] shadow">
+                    <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow">
+                        <iconify-icon icon="solar:check-circle-bold" class="text-3xl"></iconify-icon>
+                    </div>
                     <div>
                         <h2 class="text-xl font-bold text-[#323130]">Installation Complete!</h2>
                         <p class="text-xs text-[#605E5C] max-w-md mx-auto mt-1">
-                            CDN Manager has been successfully configured and database tables have been created.
+                            Open File Share has been successfully configured and database tables have been created.
                         </p>
                     </div>
 
@@ -541,11 +550,11 @@ ENV;
                         </div>
                         <div class="flex justify-between border-b border-[#EDEBE9] pb-2">
                             <span class="text-[#605E5C]">Super Admin Email:</span>
-                            <span class="font-bold text-[#323130]"><?php echo htmlspecialchars($_SESSION['installed_admin_email'] ?? 'admin@cdn.conzex.com'); ?></span>
+                            <span class="font-bold text-[#323130]"><?php echo htmlspecialchars($_SESSION['installed_admin_email'] ?? 'admin@example.com'); ?></span>
                         </div>
                         <div class="flex justify-between border-b border-[#EDEBE9] pb-2">
                             <span class="text-[#605E5C]">Super Admin Password:</span>
-                            <span class="font-bold text-[#323130]"><?php echo htmlspecialchars($_SESSION['installed_admin_pass'] ?? 'Adm1n@123'); ?></span>
+                            <span class="font-bold text-[#323130]"><?php echo htmlspecialchars($_SESSION['installed_admin_pass'] ?? '******'); ?></span>
                         </div>
                         <div class="flex justify-between pt-1">
                             <span class="text-[#605E5C]">Login Route:</span>
@@ -565,7 +574,7 @@ ENV;
 
     <!-- Footer -->
     <footer class="border-t border-[#EDEBE9] bg-white px-8 py-3 text-center text-xs text-[#605E5C]">
-        CDN File Manager • Production-Ready cPanel Package
+        Open File Share Platform • Open Source Package
     </footer>
 
 </body>
