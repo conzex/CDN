@@ -21,3 +21,5 @@ yarn-error.log
 /.ds_store
 .DS_Store
 *.DS_Store
+*.zip
+cdn.zip
