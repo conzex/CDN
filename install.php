@@ -9,7 +9,7 @@ session_start();
 $lockFile = __DIR__ . '/installed.lock';
 $reinstall = isset($_GET['reinstall']) && $_GET['reinstall'] === '1';
 
-// Check if CDN Manager is already installed and database is healthy
+// Post setup check: If already installed and database is healthy, auto-redirect to login
 if (file_exists($lockFile) && !$reinstall) {
     $dbWorking = false;
     if (file_exists(__DIR__ . '/.env')) {
@@ -42,41 +42,7 @@ if (file_exists($lockFile) && !$reinstall) {
     }
 
     if ($dbWorking) {
-        ?>
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>CDN Manager — Already Installed</title>
-            <script src="https://cdn.tailwindcss.com"></script>
-            <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
-        </head>
-        <body class="bg-[#F3F2F1] text-[#323130] antialiased min-h-screen flex items-center justify-center p-6">
-            <div class="w-full max-w-md bg-white border border-[#EDEBE9] rounded-xl shadow-lg p-8 text-center space-y-6">
-                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
-                    <iconify-icon icon="solar:check-circle-bold" class="text-3xl"></iconify-icon>
-                </div>
-                <div>
-                    <h2 class="text-xl font-bold text-[#323130]">CDN Manager is Installed</h2>
-                    <p class="text-xs text-[#605E5C] mt-2">
-                        Your application is already configured and connected to the database.
-                    </p>
-                </div>
-                <div class="pt-4 border-t border-[#EDEBE9] flex flex-col space-y-3">
-                    <a href="login" class="w-full py-2.5 bg-[#0078D4] hover:bg-[#106EBE] text-white text-xs font-bold rounded-lg transition-colors shadow flex items-center justify-center space-x-2">
-                        <span>Go to Admin Login</span>
-                        <iconify-icon icon="solar:alt-arrow-right-bold" class="text-sm"></iconify-icon>
-                    </a>
-                    <a href="install.php?reinstall=1" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-[#323130] text-xs font-semibold rounded-lg transition-colors flex items-center justify-center space-x-2">
-                        <iconify-icon icon="solar:restart-bold" class="text-sm text-[#0078D4]"></iconify-icon>
-                        <span>Reconfigure Database & Super User</span>
-                    </a>
-                </div>
-            </div>
-        </body>
-        </html>
-        <?php
+        header('Location: login');
         exit;
     }
 }
@@ -271,15 +237,50 @@ ENV;
                 @touch(__DIR__ . '/database/database.sqlite');
             }
 
-            // Execute database migrations & seeders
+            // Execute database migrations & seeders (Works even when exec() is disabled in php.ini)
             try {
-                chdir(__DIR__);
-                putenv('PATH=' . getenv('PATH') . ':/usr/local/bin:/usr/bin');
                 putenv("ADMIN_USERNAME={$adminUser}");
                 putenv("ADMIN_EMAIL={$adminEmail}");
                 putenv("ADMIN_PASSWORD={$adminPass}");
+                $_ENV['ADMIN_USERNAME'] = $adminUser;
+                $_ENV['ADMIN_EMAIL'] = $adminEmail;
+                $_ENV['ADMIN_PASSWORD'] = $adminPass;
+                $_SERVER['ADMIN_USERNAME'] = $adminUser;
+                $_SERVER['ADMIN_EMAIL'] = $adminEmail;
+                $_SERVER['ADMIN_PASSWORD'] = $adminPass;
 
-                exec('php artisan migrate:fresh --seed --force 2>&1', $output, $returnCode);
+                $_ENV['DB_CONNECTION'] = $dbConn;
+                $_ENV['DB_HOST'] = $dbHost;
+                $_ENV['DB_PORT'] = $dbPort;
+                $_ENV['DB_DATABASE'] = $dbName;
+                $_ENV['DB_USERNAME'] = $dbUser;
+                $_ENV['DB_PASSWORD'] = $dbPass;
+
+                $migrationDone = false;
+
+                // 1. In-Process Artisan execution (No exec() required)
+                if (file_exists(__DIR__ . '/vendor/autoload.php') && file_exists(__DIR__ . '/bootstrap/app.php')) {
+                    try {
+                        require_once __DIR__ . '/vendor/autoload.php';
+                        $app = require __DIR__ . '/bootstrap/app.php';
+                        $kernel = $app->make(\Illuminate\Contracts\Console\Kernel::class);
+                        $status = $kernel->call('migrate:fresh', [
+                            '--seed' => true,
+                            '--force' => true,
+                        ]);
+                        $migrationDone = ($status === 0);
+                    } catch (\Throwable $artisanEx) {
+                        $migrationDone = false;
+                    }
+                }
+
+                // 2. CLI exec() fallback if in-process artisan threw exception and exec() is available
+                if (!$migrationDone && function_exists('exec')) {
+                    chdir(__DIR__);
+                    putenv('PATH=' . getenv('PATH') . ':/usr/local/bin:/usr/bin');
+                    @exec('php artisan migrate:fresh --seed --force 2>&1', $output, $returnCode);
+                    $migrationDone = ($returnCode === 0);
+                }
 
                 // Direct PDO Failsafe for Super Admin Creation
                 if ($dbConn === 'mysql' && $pdo) {
