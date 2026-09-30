@@ -1,14 +1,13 @@
 <?php
 
 /**
- * Open File Share — Installation & Setup Wizard
+ * Open File Share — First-Time Installation & Setup Wizard
  */
 
 session_start();
 
 $lockFile = __DIR__ . '/installed.lock';
 $reinstall = isset($_GET['reinstall']) && $_GET['reinstall'] === '1';
-$hasDbError = isset($_GET['error']) && $_GET['error'] === 'db';
 
 // Test if database is properly configured and accessible
 $dbWorking = false;
@@ -42,18 +41,13 @@ if (file_exists(__DIR__ . '/.env')) {
 }
 
 // Auto-redirect to login ONLY if installed.lock exists AND database is healthy AND not explicitly re-installing
-if (file_exists($lockFile) && $dbWorking && !$reinstall && !$hasDbError) {
+if (file_exists($lockFile) && $dbWorking && !$reinstall) {
     header('Location: login');
     exit;
 }
 
+$step = (int)($_GET['step'] ?? 1);
 $errors = [];
-if (!$dbWorking || $hasDbError) {
-    $step = $_GET['step'] ?? 2;
-    $errors[] = 'Database connection error detected. Please verify your database host, database name, username, and password below.';
-} else {
-    $step = (int)($_GET['step'] ?? 1);
-}
 $success = null;
 
 // System Requirements Checks

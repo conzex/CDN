@@ -35,12 +35,12 @@ $app = require_once __DIR__.'/bootstrap/app.php';
 // Set public path to current directory for standalone root deployment
 $app->usePublicPath(__DIR__);
 
-// Handle request with graceful fallback to installer on database failure
+// Handle request with graceful fallback to installer before installation
 try {
     $app->handleRequest(Request::capture());
 } catch (\Throwable $e) {
-    if (file_exists(__DIR__.'/install.php')) {
-        header('Location: install.php?error=db');
+    if (!file_exists(__DIR__.'/installed.lock') && file_exists(__DIR__.'/install.php')) {
+        header('Location: install.php?step=2');
         exit;
     }
     throw $e;

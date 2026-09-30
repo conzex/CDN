@@ -42,13 +42,13 @@ $app = Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (\Illuminate\Database\QueryException $e, $request) {
-            if (file_exists(base_path('install.php'))) {
-                return redirect()->to('install.php?error=db');
+            if (!file_exists(base_path('installed.lock')) && file_exists(base_path('install.php'))) {
+                return redirect()->to('install.php?step=2');
             }
         });
         $exceptions->render(function (\PDOException $e, $request) {
-            if (file_exists(base_path('install.php'))) {
-                return redirect()->to('install.php?error=db');
+            if (!file_exists(base_path('installed.lock')) && file_exists(base_path('install.php'))) {
+                return redirect()->to('install.php?step=2');
             }
         });
     })->create();
