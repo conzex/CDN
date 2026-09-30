@@ -41,7 +41,16 @@ $app = Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->render(function (\Illuminate\Database\QueryException $e, $request) {
+            if (file_exists(base_path('install.php'))) {
+                return redirect()->to('install.php');
+            }
+        });
+        $exceptions->render(function (\PDOException $e, $request) {
+            if (file_exists(base_path('install.php'))) {
+                return redirect()->to('install.php');
+            }
+        });
     })->create();
 
 // Support standalone root deployment where index.php is in base path

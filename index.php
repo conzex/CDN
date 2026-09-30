@@ -39,7 +39,7 @@ $app->usePublicPath(__DIR__);
 try {
     $app->handleRequest(Request::capture());
 } catch (\Throwable $e) {
-    if ((str_contains($e->getMessage(), 'could not find driver') || str_contains($e->getMessage(), 'sqlite') || str_contains($e->getMessage(), 'SQLSTATE')) && file_exists(__DIR__.'/install.php')) {
+    if ((str_contains($e->getMessage(), 'could not find driver') || str_contains($e->getMessage(), 'sqlite') || str_contains($e->getMessage(), 'SQLSTATE') || str_contains($e->getMessage(), 'Access denied') || str_contains($e->getMessage(), 'Connection refused')) && file_exists(__DIR__.'/install.php')) {
         header('Location: install.php');
         exit;
     }
