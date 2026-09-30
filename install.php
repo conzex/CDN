@@ -477,7 +477,7 @@ ENV;
                     <div class="space-y-5 mb-8">
                         <div>
                             <label class="block text-xs font-semibold text-[#323130] mb-1">Application URL</label>
-                            <input type="url" name="app_url" required value="<?php echo htmlspecialchars($_POST['app_url'] ?? ('https://' . ($_SERVER['HTTP_HOST'] ?? 'example.com'))); ?>" placeholder="https://example.com" class="w-full px-3 py-2 text-xs bg-white border border-[#C8C6C4] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4]">
+                            <input type="url" name="app_url" required value="<?php echo htmlspecialchars($_POST['app_url'] ?? ''); ?>" placeholder="https://example.com" class="w-full px-3 py-2 text-xs bg-white border border-[#C8C6C4] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4]">
                         </div>
 
                         <!-- Database Details Card -->
