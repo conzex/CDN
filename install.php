@@ -483,7 +483,7 @@ ENV;
                     <div class="space-y-5 mb-8">
                         <div>
                             <label class="block text-xs font-semibold text-[#323130] mb-1">Application URL</label>
-                            <input type="url" name="app_url" required value="<?php echo htmlspecialchars($_POST['app_url'] ?? ''); ?>" placeholder="<?php echo 'https://' . ($_SERVER['HTTP_HOST'] ?? 'example.com'); ?>" class="w-full px-3 py-2 text-xs bg-white border border-[#C8C6C4] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4]">
+                            <input type="url" name="app_url" required value="<?php echo htmlspecialchars($_POST['app_url'] ?? ('https://' . ($_SERVER['HTTP_HOST'] ?? 'example.com'))); ?>" placeholder="https://example.com" class="w-full px-3 py-2 text-xs bg-white border border-[#C8C6C4] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4]">
                         </div>
 
                         <!-- Database Details Card -->
@@ -511,20 +511,22 @@ ENV;
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-medium text-[#605E5C] mb-1">Database Name</label>
-                                    <input type="text" name="db_database" placeholder="e.g. cdn_db" value="<?php echo htmlspecialchars($_POST['db_database'] ?? ''); ?>" class="w-full px-3 py-2 text-xs bg-white border border-[#C8C6C4] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4]">
+                            <div id="mysql-fields-container" class="space-y-4 transition-all duration-300">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-[#605E5C] mb-1">Database Name</label>
+                                        <input type="text" name="db_database" placeholder="e.g. cdn_db" value="<?php echo htmlspecialchars($_POST['db_database'] ?? ''); ?>" class="w-full px-3 py-2 text-xs bg-white border border-[#C8C6C4] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-[#605E5C] mb-1">Database Username</label>
+                                        <input type="text" name="db_username" placeholder="e.g. cdn_user" value="<?php echo htmlspecialchars($_POST['db_username'] ?? ''); ?>" class="w-full px-3 py-2 text-xs bg-white border border-[#C8C6C4] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4]">
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-[#605E5C] mb-1">Database Username</label>
-                                    <input type="text" name="db_username" placeholder="e.g. cdn_user" value="<?php echo htmlspecialchars($_POST['db_username'] ?? ''); ?>" class="w-full px-3 py-2 text-xs bg-white border border-[#C8C6C4] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4]">
-                                </div>
-                            </div>
 
-                            <div>
-                                <label class="block text-xs font-medium text-[#605E5C] mb-1">Database Password</label>
-                                <input type="password" name="db_password" placeholder="Database User Password" value="" class="w-full px-3 py-2 text-xs bg-white border border-[#C8C6C4] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4]">
+                                <div>
+                                    <label class="block text-xs font-medium text-[#605E5C] mb-1">Database Password</label>
+                                    <input type="password" name="db_password" placeholder="Database User Password" value="" class="w-full px-3 py-2 text-xs bg-white border border-[#C8C6C4] text-[#323130] rounded-lg focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4]">
+                                </div>
                             </div>
                         </div>
 
@@ -618,5 +620,24 @@ ENV;
         Open File Share Platform • Open Source Setup Wizard
     </footer>
 
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var dbConnSelect = document.querySelector('select[name="db_connection"]');
+        var mysqlFields = document.getElementById('mysql-fields-container');
+        if (dbConnSelect && mysqlFields) {
+            function toggleFields() {
+                if (dbConnSelect.value === 'sqlite') {
+                    mysqlFields.style.opacity = '0.35';
+                    mysqlFields.style.pointerEvents = 'none';
+                } else {
+                    mysqlFields.style.opacity = '1';
+                    mysqlFields.style.pointerEvents = 'auto';
+                }
+            }
+            dbConnSelect.addEventListener('change', toggleFields);
+            toggleFields();
+        }
+    });
+    </script>
 </body>
 </html>
