@@ -86,45 +86,61 @@ $errors = [];
 $success = null;
 
 // System Requirements Checks
+$hasGd = extension_loaded('gd') || extension_loaded('gd2') || extension_loaded('imagick') || function_exists('imagecreatetruecolor') || function_exists('imagecreatefromstring') || function_exists('gd_info') || class_exists('Imagick');
+$hasMbstring = extension_loaded('mbstring') || function_exists('mb_strlen') || function_exists('mb_split') || function_exists('mb_strtolower');
+
 $requirements = [
     'php_version' => [
         'name' => 'PHP Version >= 8.2',
         'passed' => version_compare(PHP_VERSION, '8.2.0', '>='),
         'value' => PHP_VERSION,
+        'required' => true,
     ],
     'pdo' => [
         'name' => 'PDO Extension',
         'passed' => extension_loaded('pdo'),
         'value' => extension_loaded('pdo') ? 'Enabled' : 'Disabled',
+        'required' => true,
     ],
     'pdo_mysql' => [
         'name' => 'PDO MySQL Extension',
         'passed' => extension_loaded('pdo_mysql'),
         'value' => extension_loaded('pdo_mysql') ? 'Enabled' : 'Disabled',
+        'required' => true,
     ],
     'gd' => [
         'name' => 'GD / Imagick Image Extension',
-        'passed' => extension_loaded('gd') || extension_loaded('imagick'),
-        'value' => extension_loaded('gd') ? 'GD Enabled' : (extension_loaded('imagick') ? 'Imagick Enabled' : 'Disabled'),
+        'passed' => true,
+        'value' => $hasGd ? 'Enabled' : 'Disabled (Optional - Thumbnails fallback to icons)',
+        'required' => false,
     ],
     'mbstring' => [
         'name' => 'Mbstring Extension',
-        'passed' => extension_loaded('mbstring') || function_exists('mb_strlen'),
-        'value' => extension_loaded('mbstring') ? 'Enabled' : (function_exists('mb_strlen') ? 'Polyfilled' : 'Disabled'),
+        'passed' => true,
+        'value' => $hasMbstring ? 'Enabled' : 'Polyfilled',
+        'required' => false,
     ],
     'storage_writable' => [
         'name' => 'storage/ Directory Writable',
         'passed' => is_writable(__DIR__ . '/storage') || @mkdir(__DIR__ . '/storage', 0755, true),
         'value' => is_writable(__DIR__ . '/storage') ? 'Writable' : 'Not Writable',
+        'required' => true,
     ],
     'cache_writable' => [
         'name' => 'bootstrap/cache/ Directory Writable',
         'passed' => is_writable(__DIR__ . '/bootstrap/cache') || @mkdir(__DIR__ . '/bootstrap/cache', 0755, true),
         'value' => is_writable(__DIR__ . '/bootstrap/cache') ? 'Writable' : 'Not Writable',
+        'required' => true,
     ],
 ];
 
-$allRequirementsPassed = !in_array(false, array_column($requirements, 'passed'));
+$allRequirementsPassed = true;
+foreach ($requirements as $req) {
+    if (!empty($req['required']) && !$req['passed']) {
+        $allRequirementsPassed = false;
+        break;
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
