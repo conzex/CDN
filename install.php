@@ -9,42 +9,10 @@ session_start();
 $lockFile = __DIR__ . '/installed.lock';
 $reinstall = isset($_GET['reinstall']) && $_GET['reinstall'] === '1';
 
-// Post setup check: If already installed and database is healthy, auto-redirect to login
+// Post setup check: If already installed, auto-redirect to login
 if (file_exists($lockFile) && !$reinstall) {
-    $dbWorking = false;
-    if (file_exists(__DIR__ . '/.env')) {
-        $envContent = file_get_contents(__DIR__ . '/.env');
-        preg_match('/DB_CONNECTION=(.*)/', $envContent, $mConn);
-        preg_match('/DB_HOST=(.*)/', $envContent, $mHost);
-        preg_match('/DB_PORT=(.*)/', $envContent, $mPort);
-        preg_match('/DB_DATABASE=(.*)/', $envContent, $mDb);
-        preg_match('/DB_USERNAME=(.*)/', $envContent, $mUser);
-        preg_match('/DB_PASSWORD=(.*)/', $envContent, $mPass);
-
-        $conn = trim($mConn[1] ?? 'mysql', "\"' \r\n");
-        $host = trim($mHost[1] ?? '127.0.0.1', "\"' \r\n");
-        $port = trim($mPort[1] ?? '3306', "\"' \r\n");
-        $dbname = trim($mDb[1] ?? '', "\"' \r\n");
-        $user = trim($mUser[1] ?? '', "\"' \r\n");
-        $pass = trim($mPass[1] ?? '', "\"' \r\n");
-
-        if ($conn === 'mysql' && !empty($dbname) && !empty($user)) {
-            try {
-                $dsn = "mysql:host={$host};port={$port};dbname={$dbname}";
-                $pdoTest = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 2]);
-                $dbWorking = true;
-            } catch (\Throwable $e) {
-                $dbWorking = false;
-            }
-        } elseif ($conn === 'sqlite' && extension_loaded('pdo_sqlite')) {
-            $dbWorking = true;
-        }
-    }
-
-    if ($dbWorking) {
-        header('Location: login');
-        exit;
-    }
+    header('Location: login');
+    exit;
 }
 
 $step = $_GET['step'] ?? 1;

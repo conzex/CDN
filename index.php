@@ -35,11 +35,11 @@ $app = require_once __DIR__.'/bootstrap/app.php';
 // Set public path to current directory for cPanel root deployment
 $app->usePublicPath(__DIR__);
 
-// Handle request with graceful fallback to installer on database driver failure
+// Handle request with graceful fallback to installer before installation
 try {
     $app->handleRequest(Request::capture());
 } catch (\Throwable $e) {
-    if ((str_contains($e->getMessage(), 'could not find driver') || str_contains($e->getMessage(), 'sqlite') || str_contains($e->getMessage(), 'SQLSTATE') || str_contains($e->getMessage(), 'Access denied') || str_contains($e->getMessage(), 'Connection refused')) && file_exists(__DIR__.'/install.php')) {
+    if (!file_exists(__DIR__.'/installed.lock') && file_exists(__DIR__.'/install.php')) {
         header('Location: install.php');
         exit;
     }
